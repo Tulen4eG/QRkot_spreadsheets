@@ -1,0 +1,14 @@
+Создать бд:
+   ```
+   alembic upgrade head
+   ```
+
+Создать файл миграции:
+   ```
+   alembic revision --autogenerate -m "name"
+   ```
+
+Перемещение по таймлайну:
+  ```
+  alembic upgrade / alembic downgrade name
+  ```
