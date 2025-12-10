@@ -40,7 +40,7 @@ async def create_spreadsheets(
     response = await wrapper_services.as_service_account(
         service.spreadsheets.create(json=spreadsheet_body)
     )
-    return response['spreadsheetId']
+    return response['spreadsheetId'], response['spreadsheetUrl']
 
 
 async def set_user_permissions(

@@ -1,5 +1,5 @@
 from aiogoogle import Aiogoogle
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.db import get_async_session
@@ -29,8 +29,15 @@ async def get_report(
     projects = await charity_project_crud.get_projects_by_completion_rate(
         session
     )
-    spreadsheet_id = await create_spreadsheets(wrapper_services)
+    spreadsheet_id, url = await create_spreadsheets(wrapper_services)
     await set_user_permissions(spreadsheet_id, wrapper_services)
-    await update_spreadsheets_value(spreadsheet_id, projects, wrapper_services)
-    url = "https://docs.google.com/spreadsheets/d/" + spreadsheet_id
+    try:
+        await update_spreadsheets_value(
+            spreadsheet_id, projects, wrapper_services
+        )
+    except ValueError as error:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f'Ошибка при обновлении таблицы: {error}'
+        )
     return {"Table url": url}
